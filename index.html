@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intellixor Neon Cyber Lab</title>
+<link rel="icon" type="image/png" href="image.png">
+
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+font-family:monospace;
+background:linear-gradient(270deg,#000,#001f1f,#000);
+background-size:600% 600%;
+animation:bgMove 12s infinite alternate;
+color:#00ffff;
+overflow-x:hidden;
+opacity:0;
+transition:opacity 1s;
+}
+@keyframes bgMove{
+0%{background-position:0% 50%}
+100%{background-position:100% 50%}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-thumb{
+background:#00ffff;
+box-shadow:0 0 10px #00ffff;
+}
+
+/* MATRIX */
+canvas{
+position:fixed;
+top:0;left:0;
+z-index:-1;
+}
+
+/* NAV */
+nav{
+position:fixed;
+top:0;
+width:100%;
+background:rgba(0,0,0,0.8);
+backdrop-filter:blur(10px);
+display:flex;
+justify-content:space-between;
+padding:15px 25px;
+z-index:1000;
+border-bottom:1px solid #00ffff;
+}
+nav h2{text-shadow:0 0 15px #00ffff}
+
+/* HERO */
+.hero{
+height:60vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+margin-top:60px;
+}
+.hero h1{
+font-size:2rem;
+text-shadow:0 0 20px #00ffff;
+}
+
+/* SECTION */
+.section{
+padding:40px 20px;
+max-width:1200px;
+margin:auto;
+}
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:25px;
+}
+
+/* CARD */
+.card{
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(15px);
+padding:20px;
+border-radius:15px;
+border:2px solid #00ffff;
+transition:.4s;
+transform-style:preserve-3d;
+}
+.card:hover{
+box-shadow:0 0 30px #ff00ff;
+transform:rotateY(6deg) rotateX(6deg);
+}
+
+input,textarea,button{
+width:100%;
+margin-top:8px;
+padding:10px;
+background:black;
+border:1px solid #00ffff;
+color:#00ffff;
+}
+
+button{
+background:#00ffff;
+color:black;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
+}
+button:hover{
+background:#ff00ff;
+color:white;
+}
+
+.result{
+margin-top:8px;
+font-size:13px;
+word-wrap:break-word;
+}
+
+.terminal{
+height:120px;
+overflow:auto;
+background:black;
+padding:10px;
+font-size:12px;
+margin-top:8px;
+}
+
+/* Loader */
+#loader{
+position:fixed;
+width:100%;
+height:100%;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:3000;
+}
+.spinner{
+width:60px;
+height:60px;
+border:5px solid #00ffff;
+border-top:5px solid #ff00ff;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+@keyframes spin{
+0%{transform:rotate(0deg)}
+100%{transform:rotate(360deg)}
+}
+
+/* Floating Button */
+.floatBtn{
+position:fixed;
+bottom:20px;
+right:20px;
+width:55px;
+height:55px;
+border-radius:50%;
+font-size:18px;
+}
+
+@media(max-width:768px){
+.hero h1{font-size:1.4rem}
+}
+</style>
+</head>
+
+<body>
+
+<div id="loader"><div class="spinner"></div></div>
+<canvas id="matrix"></canvas>
+
+<nav>
+<h2>Intellixor Neon Lab</h2>
+</nav>
+
+<div class="hero">
+<h1>Ultimate Cyber Toolkit</h1>
+</div>
+
+<section class="section">
+<div class="grid">
+
+<div class="card">
+<h3>SHA-256</h3>
+<input id="shaInput">
+<button onclick="sha256()">Generate</button>
+<div class="result" id="shaResult"></div>
+</div>
+
+<div class="card">
+<h3>SHA-512</h3>
+<input id="sha512Input">
+<button onclick="sha512()">Generate</button>
+<div class="result" id="sha512Result"></div>
+</div>
+
+<div class="card">
+<h3>Base64</h3>
+<input id="bInput">
+<button onclick="b64enc()">Encode</button>
+<button onclick="b64dec()">Decode</button>
+<div class="result" id="bResult"></div>
+</div>
+
+<div class="card">
+<h3>Password Generator</h3>
+<button onclick="genPass()">Generate</button>
+<div class="result" id="passResult"></div>
+</div>
+
+<div class="card">
+<h3>Password Strength</h3>
+<input id="strengthInput" type="password">
+<button onclick="checkStrength()">Check</button>
+<div class="result" id="strengthResult"></div>
+</div>
+
+<div class="card">
+<h3>UUID</h3>
+<button onclick="genUUID()">Generate</button>
+<div class="result" id="uuidResult"></div>
+</div>
+
+<div class="card">
+<h3>URL Encode/Decode</h3>
+<input id="urlInput">
+<button onclick="urlEnc()">Encode</button>
+<button onclick="urlDec()">Decode</button>
+<div class="result" id="urlResult"></div>
+</div>
+
+<div class="card">
+<h3>Text ↔ Binary</h3>
+<input id="binInput">
+<button onclick="toBinary()">To Binary</button>
+<button onclick="toText()">To Text</button>
+<div class="result" id="binResult"></div>
+</div>
+
+<div class="card">
+<h3>Hex Encode/Decode</h3>
+<input id="hexInput">
+<button onclick="hexEnc()">Encode</button>
+<button onclick="hexDec()">Decode</button>
+<div class="result" id="hexResult"></div>
+</div>
+
+<div class="card">
+<h3>ROT13</h3>
+<input id="rotInput">
+<button onclick="rot13()">Transform</button>
+<div class="result" id="rotResult"></div>
+</div>
+
+<div class="card">
+<h3>JSON Formatter</h3>
+<textarea id="jsonInput"></textarea>
+<button onclick="formatJSON()">Format</button>
+<div class="result" id="jsonResult"></div>
+</div>
+
+<div class="card">
+<h3>IP Validator</h3>
+<input id="ipInput">
+<button onclick="validateIP()">Validate</button>
+<div class="result" id="ipResult"></div>
+</div>
+
+<div class="card">
+<h3>Hacker Terminal</h3>
+<div class="terminal" id="terminalBox"></div>
+<input id="terminalInput">
+<button onclick="runCommand()">Run</button>
+</div>
+
+</div>
+</section>
+
+<button class="floatBtn" onclick="scrollToTop()">↑</button>
+
+<script>
+window.addEventListener("load",()=>{
+setTimeout(()=>{
+document.getElementById("loader").style.display="none";
+document.body.style.opacity="1";
+},1200);
+});
+
+// MATRIX
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+canvas.height=window.innerHeight;
+canvas.width=window.innerWidth;
+const letters="01";
+const fontSize=14;
+const columns=canvas.width/fontSize;
+const drops=[];
+for(let x=0;x<columns;x++)drops[x]=1;
+function draw(){
+ctx.fillStyle="rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#00ffff";
+ctx.font=fontSize+"px monospace";
+for(let i=0;i<drops.length;i++){
+const text=letters[Math.floor(Math.random()*letters.length)];
+ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+if(drops[i]*fontSize>canvas.height&&Math.random()>0.975)drops[i]=0;
+drops[i]++;
+}}
+setInterval(draw,35);
+
+// TOOLS
+async function sha256(){
+let b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(shaInput.value));
+shaResult.innerText=Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+async function sha512(){
+let b=await crypto.subtle.digest("SHA-512",new TextEncoder().encode(sha512Input.value));
+sha512Result.innerText=Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function b64enc(){bResult.innerText=btoa(bInput.value)}
+function b64dec(){try{bResult.innerText=atob(bInput.value)}catch{bResult.innerText="Invalid"}}
+function genPass(){
+let chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$";
+let pass="";
+for(let i=0;i<14;i++)pass+=chars[Math.floor(Math.random()*chars.length)];
+passResult.innerText=pass;
+}
+function checkStrength(){
+let p=strengthInput.value;
+let score=0;
+if(p.length>8)score++;
+if(/[A-Z]/.test(p))score++;
+if(/[0-9]/.test(p))score++;
+if(/[^A-Za-z0-9]/.test(p))score++;
+strengthResult.innerText=["Weak","Medium","Strong","Very Strong"][score];
+}
+function genUUID(){uuidResult.innerText=crypto.randomUUID()}
+function urlEnc(){urlResult.innerText=encodeURIComponent(urlInput.value)}
+function urlDec(){urlResult.innerText=decodeURIComponent(urlInput.value)}
+function toBinary(){binResult.innerText=binInput.value.split('').map(x=>x.charCodeAt(0).toString(2)).join(' ')}
+function toText(){binResult.innerText=binInput.value.split(' ').map(x=>String.fromCharCode(parseInt(x,2))).join('')}
+function hexEnc(){hexResult.innerText=Array.from(hexInput.value).map(c=>c.charCodeAt(0).toString(16)).join(' ')}
+function hexDec(){hexResult.innerText=hexInput.value.split(' ').map(h=>String.fromCharCode(parseInt(h,16))).join('')}
+function rot13(){rotResult.innerText=rotInput.value.replace(/[a-zA-Z]/g,c=>String.fromCharCode((c<="Z"?90:122)>=(c=c.charCodeAt(0)+13)?c:c-26))}
+function formatJSON(){try{jsonResult.innerText=JSON.stringify(JSON.parse(jsonInput.value),null,2)}catch{jsonResult.innerText="Invalid JSON"}}
+function validateIP(){
+let r=/^(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$/;
+ipResult.innerText=r.test(ipInput.value)?"Valid IP":"Invalid IP";
+}
+function runCommand(){
+let cmd=terminalInput.value;
+let box=terminalBox;
+let output="Command not found";
+if(cmd==="help")output="Commands: help, whoami, clear";
+if(cmd==="whoami")output="You are Elite Hacker 😈";
+if(cmd==="clear"){box.innerHTML="";return;}
+box.innerHTML+="<div>> "+cmd+"</div><div>"+output+"</div>";
+terminalInput.value="";
+box.scrollTop=box.scrollHeight;
+}
+function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
+</script>
+
+</body>
+</html>
